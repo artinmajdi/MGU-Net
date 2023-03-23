@@ -133,22 +133,19 @@ class GloRe_Unit(nn.Module):
     def forward(self, x):
         batch_size = x.size(0)
         # generate projection and inverse projection matrices
-        x_state_reshaped = self.conv_state(x).view(batch_size, self.num_s, -1) 
+        x_state_reshaped = self.conv_state(x).view(batch_size, self.num_s, -1)
         x_proj_reshaped = self.conv_proj(x).view(batch_size, self.num_n, -1)
         x_rproj_reshaped = self.conv_reproj(x).view(batch_size, self.num_n, -1)
         # project to node space
-        x_n_state1 = torch.bmm(x_state_reshaped, x_proj_reshaped.permute(0, 2, 1)) 
+        x_n_state1 = torch.bmm(x_state_reshaped, x_proj_reshaped.permute(0, 2, 1))
         x_n_state2 = x_n_state1 * (1. / x_state_reshaped.size(2))
         # graph convolution
-        x_n_rel1 = self.gcn1(x_n_state2)  
+        x_n_rel1 = self.gcn1(x_n_state2)
         x_n_rel2 = self.gcn2(x_n_rel1)
         # inverse project to original space
         x_state_reshaped = torch.bmm(x_n_rel2, x_rproj_reshaped)
         x_state = x_state_reshaped.view(batch_size, self.num_s, *x.size()[2:])
-        # fusion
-        out = x + self.blocker(self.fc_2(x_state))
-
-        return out
+        return x + self.blocker(self.fc_2(x_state))
 
 def img2df(img, mask):
         img[mask == 0] = 0

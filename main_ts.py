@@ -135,17 +135,19 @@ def eval(phase, args, eval_data_loader, model, result_path = None, logger = None
         with torch.no_grad():
             image_var = Variable(image).cuda()
             # model forward
-            _,_,output_seg = model(image_var) 
+            _,_,output_seg = model(image_var)
             _, pred_seg = torch.max(output_seg, 1)
             # save visualized result
             pred_seg = pred_seg.cpu().data.numpy().astype('uint8')
-            if phase == 'eval' or phase == 'test':
+            if phase in ['eval', 'test']:
                 imt = (imt.squeeze().numpy()).astype('uint8')
                 ant = label.numpy().astype('uint8')
                 save_dir = osp.join(result_path, 'vis')
                 if not exists(save_dir): os.makedirs(save_dir)
-                if not exists(save_dir+'/label'):os.makedirs(save_dir+'/label')
-                if not exists(save_dir + '/pred'): os.makedirs(save_dir + '/pred')
+                if not exists(f'{save_dir}/label'):
+                    os.makedirs(f'{save_dir}/label')
+                if not exists(f'{save_dir}/pred'):
+                    os.makedirs(f'{save_dir}/pred')
                 vis_result(imn, imt, ant, pred_seg, save_dir)
                 print('Saved visualized results!')
             # calculate dice and pa score for segmentation
@@ -242,7 +244,7 @@ def eval(phase, args, eval_data_loader, model, result_path = None, logger = None
     print('Final PA_8 Score:{:.4f}'.format(final_pa_8))
     print('Final PA_9 Score:{:.4f}'.format(final_pa_9))
     print('Final PA_10 Score:{:.4f}'.format(final_pa_10))
-    if phase == 'eval' or phase == 'test':
+    if phase in ['eval', 'test']:
         logger.append(
         [ final_dice_avg, final_dice_1, final_dice_2, final_dice_3, final_dice_4, final_dice_5, final_dice_6, final_dice_7, final_dice_8, final_dice_9,  final_dice_10,
         final_pa_avg, final_pa_1, final_pa_2, final_pa_3, final_pa_4, final_pa_5, final_pa_6, final_pa_7, final_pa_8, final_pa_9, final_pa_10])
@@ -303,7 +305,7 @@ def eval_seg(args, eval_result_path, eval_loader):
           ['Dice', 'Dice_1', 'Dice_2', 'Dice_3', 'Dice_4', 'Dice_5', 'Dice_6', 'Dice_7', 'Dice_8', 'Dice_9','Dice_10',
          'mpa', 'pa_1', 'pa_2','pa_3', 'pa_4', 'pa_5', 'pa_6', 'pa_7', 'pa_8', 'pa_9','pa_10',])
     # load the model
-    print('Loading eval model: {}'.format(args.name))
+    print(f'Loading eval model: {args.name}')
     net = net_builder(args.name)
     model = torch.nn.DataParallel(net).cuda()
     checkpoint = torch.load(args.model_path)
@@ -352,8 +354,7 @@ def parse_args():
                         metavar='W', help='weight decay (default: 1e-4)')
     parser.add_argument('--t', type=str, default='t1')
     parser.add_argument('--model-path', help='pretrained model test', default=' ', type=str)
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 def main():
     ##### config #####
@@ -363,12 +364,16 @@ def main():
     torch.cuda.manual_seed(seed)
     print('torch version:',torch.__version__)
     ##### result path setting #####
-    tn = args.t 
+    tn = args.t
     task_name = args.data_dir.split('/')[-2] + '/' + args.data_dir.split('/')[-1]
-    train_result_path = osp.join('result',task_name,'train',args.name + '_' +str(args.lr) + '_'+ tn)
+    train_result_path = osp.join(
+        'result', task_name, 'train', f'{args.name}_{str(args.lr)}_{tn}'
+    )
     if not exists(train_result_path):
         os.makedirs(train_result_path)
-    test_result_path = osp.join('result',task_name,'test',args.name + '_' +str(args.lr) + '_'+ tn)
+    test_result_path = osp.join(
+        'result', task_name, 'test', f'{args.name}_{str(args.lr)}_{tn}'
+    )
     if not exists(test_result_path):
         os.makedirs(test_result_path)
     ##### load dataset #####

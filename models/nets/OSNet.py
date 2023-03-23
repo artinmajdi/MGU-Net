@@ -12,5 +12,4 @@ class OSMGUNet(nn.Module):
     
     def forward(self, inputs):
         out = self.stage(inputs)
-        output = F.log_softmax(out, dim=1)
-        return output
+        return F.log_softmax(out, dim=1)

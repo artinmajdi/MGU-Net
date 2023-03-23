@@ -21,7 +21,7 @@ def adjust_learning_rate(args, optimizer, epoch):
     elif args.lr_mode == 'poly':
         lr = args.lr * (1 - epoch / args.epochs) ** 0.9
     else:
-        raise ValueError('Unknown lr mode {}'.format(args.lr_mode))
+        raise ValueError(f'Unknown lr mode {args.lr_mode}')
 
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
@@ -165,5 +165,15 @@ def compute_single_avg_score(ret_seg):
         Choroid_seg = ret_seg[9]
     if not math.isnan(ret_seg[10]):
         Disc_seg = ret_seg[10]
-    avg_seg = (NFL_seg + GCL_seg + IPL_seg + INL_seg + OPL_seg + ONL_seg + IS_OS_seg + RPE_seg + Choroid_seg + Disc_seg) / 10
-    return avg_seg
+    return (
+        NFL_seg
+        + GCL_seg
+        + IPL_seg
+        + INL_seg
+        + OPL_seg
+        + ONL_seg
+        + IS_OS_seg
+        + RPE_seg
+        + Choroid_seg
+        + Disc_seg
+    ) / 10

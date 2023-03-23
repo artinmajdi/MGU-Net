@@ -7,13 +7,13 @@ def vis_result(imn, imt, ant, pred, save_dir, n_class=11):
     img = gray2rgbimage(imt)
     imn = imn[0]
     pred_img = draw_img(imt, pred, n_class=n_class)
-    if(ant is None):
+    if (ant is None):
         cv2.imwrite(osp.join(save_dir, imn), np.hstack((img, pred_img)).astype('uint8'))
     else:
         ant_img = draw_img(imt, ant, n_class=n_class)
         cv2.imwrite(osp.join(save_dir, imn), np.hstack((img,ant_img,pred_img )).astype('uint8'))
-        cv2.imwrite(osp.join(save_dir, 'label/' + imn), ant_img.astype('uint8'))
-        cv2.imwrite(osp.join(save_dir, 'pred/' + imn), pred_img.astype('uint8'))
+        cv2.imwrite(osp.join(save_dir, f'label/{imn}'), ant_img.astype('uint8'))
+        cv2.imwrite(osp.join(save_dir, f'pred/{imn}'), pred_img.astype('uint8'))
 
 def draw_img(img, seg, title = None, n_class=11):
     mask = img
@@ -41,8 +41,7 @@ def draw_img(img, seg, title = None, n_class=11):
         mask[:, :, 0][seg[0,:,:] == draw_label] =(color_set[draw_label][0])
         mask[:, :, 1][seg[0,:,:] == draw_label] = ( color_set[draw_label][1])
         mask[:, :, 2][seg[0,:,:] == draw_label] = (color_set[draw_label][2])
-    img_mask = cv2.addWeighted(img,0.4,mask,0.6,0)
-    return img_mask
+    return cv2.addWeighted(img,0.4,mask,0.6,0)
 
 
 def gray2rgbimage(image):

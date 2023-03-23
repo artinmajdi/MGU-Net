@@ -22,12 +22,12 @@ class Logger(object):
                 name = self.file.readline()
                 self.names = name.rstrip().split('\t')
                 self.numbers = {}
-                for _, name in enumerate(self.names):
+                for name in self.names:
                     self.numbers[name] = []
 
                 for numbers in self.file:
                     numbers = numbers.rstrip().split('\t')
-                    for i in range(0, len(numbers)):
+                    for i in range(len(numbers)):
                         self.numbers[self.names[i]].append(numbers[i])
                 self.file.close()
                 self.file = open(fpath, 'a')
@@ -35,12 +35,10 @@ class Logger(object):
                 self.file = open(fpath, 'w')
 
     def set_names(self, names):    # names for every line
-        if self.resume:
-            pass
         # initialize numbers as empty list
         self.numbers = {}
         self.names = names
-        for _, name in enumerate(self.names):
+        for name in self.names:
             self.file.write(name)
             self.file.write('\t')
             self.numbers[name] = []

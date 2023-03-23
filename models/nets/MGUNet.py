@@ -89,9 +89,7 @@ class MGUNet_1(nn.Module):
 
         # initialise weights
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                init_weights(m, init_type='kaiming')
-            elif isinstance(m, nn.BatchNorm2d):
+            if isinstance(m, (nn.Conv2d, nn.BatchNorm2d)):
                 init_weights(m, init_type='kaiming')
 
     def forward(self, inputs):
@@ -146,9 +144,7 @@ class MGUNet_2(nn.Module):
 
         # initialise weights
         for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                init_weights(m, init_type='kaiming')
-            elif isinstance(m, nn.BatchNorm2d):
+            if isinstance(m, (nn.Conv2d, nn.BatchNorm2d)):
                 init_weights(m, init_type='kaiming')
 
     def forward(self, inputs):

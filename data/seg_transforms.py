@@ -28,10 +28,7 @@ class Normalize(object):
     def __call__(self, image, label=None):
         for t, m, s in zip(image, self.mean, self.std):
             t.sub_(m).div_(s)
-        if label is None:
-            return image,
-        else:
-            return image, label
+        return (image, ) if label is None else (image, label)
 
 
 class ToTensor(object):
@@ -47,10 +44,7 @@ class ToTensor(object):
             # handle PIL Image
             img = torch.ByteTensor(torch.ByteStorage.from_buffer(pic.tobytes()))
             # PIL image mode: 1, L, P, I, F, RGB, YCbCr, RGBA, CMYK
-            if pic.mode == 'YCbCr':
-                nchannel = 3
-            else:
-                nchannel = len(pic.mode)
+            nchannel = 3 if pic.mode == 'YCbCr' else len(pic.mode)
             img = img.view(pic.size[1], pic.size[0], nchannel)
             # put it from HWC to CHW format
             # yikes, this transpose takes 80% of the loading time/CPU
